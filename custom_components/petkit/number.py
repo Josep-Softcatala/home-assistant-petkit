@@ -54,6 +54,12 @@ async def async_setup_entry(
                 MinEatingDuration(coordinator, feeder_id)
             )
 
+        # D4sh Feeder
+        if feeder_data.type == 'd4sh':
+            numbers.append(
+                Volume(coordinator, feeder_id),
+            )
+
         # Fresh Element Feeder
         if feeder_data.type == 'feeder':
             numbers.append(
