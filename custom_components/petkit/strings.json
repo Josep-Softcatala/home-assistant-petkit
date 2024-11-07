@@ -789,6 +789,9 @@
       },
       "prompt_tone": {
         "name": "Prompt tone"
+      },
+      "system_sound": {
+        "name": "System sound"
       }
     },
     "text": {
