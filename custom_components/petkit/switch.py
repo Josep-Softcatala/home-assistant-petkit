@@ -66,6 +66,8 @@ async def async_setup_entry(
                     NightVision(coordinator, feeder_id),
                     Microphone(coordinator, feeder_id),
                     LowBatteryNotif(coordinator, feeder_id),
+                    SystemSound(coordinator, feeder_id),
+                    VoiceDispense(coordinator, feeder_id),
                 )
             )
 
@@ -3414,3 +3416,97 @@ class NightVision(CoordinatorEntity, SwitchEntity):
         self.feeder_data.data["settings"]["night"] = 0
         self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
+
+
+class SystemSound(CoordinatorEntity, SwitchEntity):
+    """Representation of D4sh system sound."""
+
+    def __init__(self, coordinator, feeder_id):
+        super().__init__(coordinator)
+        self.feeder_id = feeder_id
+
+    @property
+    def feeder_data(self) -> Feeder:
+        """Handle coordinator Feeder data."""
+
+        return self.coordinator.data.feeders[self.feeder_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+
+        return {
+            "identifiers": {(DOMAIN, self.feeder_data.id)},
+            "name": self.feeder_data.data['name'],
+            "manufacturer": "PetKit",
+            "model": FEEDERS[self.feeder_data.type],
+            "sw_version": f'{self.feeder_data.data["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+
+        return str(self.feeder_data.id) + '_system_sound'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+
+        return 'system_sound'
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+
+        if self.is_on:
+            return 'mdi:volume-high'
+        else:
+            return 'mdi:volume-off'
+
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to config."""
+
+        return EntityCategory.CONFIG
+
+    @property
+    def is_on(self) -> bool:
+        """Determine if voice with dispense is on."""
+
+        return self.feeder_data.data['settings']['systemSoundEnable'] == 1
+
+    @property
+    def available(self) -> bool:
+        """Only make available if device is online."""
+
+        if self.feeder_data.data['state']['pim'] != 0:
+            return True
+        else:
+            return False
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn voice with dispense on."""
+
+        await self.coordinator.client.update_feeder_settings(self.feeder_data, FeederSetting.SYSTEM_SOUND, 1)
+
+        self.feeder_data.data['settings']['systemSoundEnable'] = 1
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn voice with dispense off."""
+
+        await self.coordinator.client.update_feeder_settings(self.feeder_data, FeederSetting.SYSTEM_SOUND, 0)
+
+        self.feeder_data.data['settings']['systemSoundEnable'] = 0
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+
