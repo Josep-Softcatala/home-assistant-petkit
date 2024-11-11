@@ -59,6 +59,7 @@ async def async_setup_entry(
                     CameraStatus(coordinator, feeder_id),
                     Eating(coordinator, feeder_id),
                     Feeding(coordinator, feeder_id),
+                    CarePlusSubscription(coordinator, feeder_id)
                 )
             )
 
@@ -1053,3 +1054,60 @@ class LBBWastePresence(CoordinatorEntity, BinarySensorEntity):
             return False
         else:
             return True
+
+
+class CarePlusSubscription(CoordinatorEntity, BinarySensorEntity):
+    """Representation of Care Plus subscription status."""
+
+    def __init__(self, coordinator, feeder_id):
+        super().__init__(coordinator)
+        self.feeder_id = feeder_id
+
+    @property
+    def feeder_data(self) -> Feeder:
+        """Handle coordinator Feeder data."""
+        return self.coordinator.data.feeders[self.feeder_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.feeder_data.id)},
+            "name": self.feeder_data.data["name"],
+            "manufacturer": "PetKit",
+            "model": FEEDERS[self.feeder_data.type],
+            "sw_version": f'{self.feeder_data.data["firmware"]}',
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.feeder_data.id) + "_care_plus_subscription"
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "care_plus_subscription"
+
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to diagnostic."""
+        return EntityCategory.DIAGNOSTIC
+
+    @property
+    def is_on(self) -> bool:
+        """Return True if Care Plus subscription is active."""
+        return self.feeder_data.data["cloudProduct"]["subscribe"] == 1
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        if self.feeder_data.data["cloudProduct"]["subscribe"] == 1:
+            return "mdi:check-circle"
+        else:
+            return "mdi:cancel"

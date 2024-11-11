@@ -118,7 +118,10 @@ async def async_setup_entry(
         # D4sh Feeder
         if feeder_data.type == 'd4sh':
             # Unknow information about D4sh Feeder
-            sensors.extend((Bowl(coordinator, feeder_id),))
+            sensors.extend((
+                Bowl(coordinator, feeder_id),
+                EndDateCarePlusSubscription(coordinator, feeder_id),
+            ))
 
         # Fresh Element Feeder
         if feeder_data.type == 'feeder':
@@ -4211,3 +4214,58 @@ class Bowl(CoordinatorEntity, SensorEntity):
         """Set icon."""
 
         return "mdi:bowl"
+
+
+class EndDateCarePlusSubscription(CoordinatorEntity, SensorEntity):
+    """Representation of Care Plus subscription end date."""
+
+    def __init__(self, coordinator, feeder_id):
+        super().__init__(coordinator)
+        self.feeder_id = feeder_id
+
+    @property
+    def feeder_data(self) -> Feeder:
+        """Handle coordinator Feeder data."""
+        return self.coordinator.data.feeders[self.feeder_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.feeder_data.id)},
+            "name": self.feeder_data.data["name"],
+            "manufacturer": "PetKit",
+            "model": FEEDERS[self.feeder_data.type],
+            "sw_version": f'{self.feeder_data.data["firmware"]}',
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.feeder_data.id) + "_care_plus_end_date"
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "care_plus_end_date"
+
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to diagnostic."""
+        return EntityCategory.DIAGNOSTIC
+
+    @property
+    def native_value(self) -> str:
+        """Return the end date of Care Plus subscription."""
+        timestamp = self.feeder_data.data["cloudProduct"]["workIndate"]
+        return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        return "mdi:calendar"

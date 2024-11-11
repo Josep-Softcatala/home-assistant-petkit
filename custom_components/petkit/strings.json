@@ -93,6 +93,9 @@
       },
       "waste_bin_presence": {
           "name": "Waste bin presence"
+      },
+      "care_plus_subscription": {
+        "name": "Care+ subscription"
       }
     },
     "button": {
