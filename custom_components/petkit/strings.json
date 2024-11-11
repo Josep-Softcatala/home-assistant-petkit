@@ -90,7 +90,10 @@
       },
       "food_level_hopper_two": {
         "name": "Food level hopper 2"
-      }
+        },
+        "care_plus_subscription": {
+          "name": "Care+ subscription"
+        }
     },
     "button": {
       "reset_filter": {
@@ -697,6 +700,9 @@
       },
       "food_left": {
         "name": "Food left"
+      },
+      "care_plus_end_date": {
+        "name": "Care+ subscription end date"
       }
     },
     "switch": {
