@@ -703,6 +703,9 @@
       },
       "food_left": {
         "name": "Food left"
+      },
+      "care_plus_end_date": {
+        "name": "Care+ subscription end date"
       }
     },
     "switch": {
