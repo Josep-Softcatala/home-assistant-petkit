@@ -4,7 +4,7 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
-rom homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import device_registry as dr
 
 from .const import DOMAIN, LOGGER, PETKIT_COORDINATOR, PLATFORMS, POLLING_INTERVAL, REGION, TIMEZONE, UPDATE_LISTENER
 from .coordinator import PetKitDataUpdateCoordinator
