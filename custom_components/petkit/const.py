@@ -355,6 +355,7 @@ FEEDERS = {
 LITTER_BOXES = {
     't3': 'PURA X',
     't4': 'PURA MAX',
+    't6': 'Purobot Ultra'
 }
 
 CLEANING_INTERVAL_NAMED = {
