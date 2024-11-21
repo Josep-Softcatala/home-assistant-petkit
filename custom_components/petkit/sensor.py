@@ -521,7 +521,7 @@ class FeederStatus(CoordinatorEntity, SensorEntity):
     def translation_key(self) -> str:
         """Translation key for this entity."""
 
-        return "feeder_status"
+        return "device_status"
 
     @property
     def native_value(self) -> str | None:
@@ -2826,7 +2826,7 @@ class MAXLastEvent(CoordinatorEntity, SensorEntity):
                 return description
 
         if event_type == 10:
-            if record["petId"] in ["-1", "-2", "-3"]:
+            if (record['petId'] == '-2') or (record['petId'] == '-1'):
                 name = 'Unknown'
             else:
                 name = record['petName']
