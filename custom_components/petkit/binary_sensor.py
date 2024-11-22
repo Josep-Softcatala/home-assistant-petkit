@@ -72,7 +72,7 @@ async def async_setup_entry(
     # Litter boxes
     for lb_id, lb_data in coordinator.data.litter_boxes.items():
         # Pura X & Pura MAX
-        if lb_data.type in ['t3', 't4']:
+        if lb_data.type in ['t3', 't4', 't6']:
             binary_sensors.extend((
                 LBBinFull(coordinator, lb_id),
                 LBLitterLack(coordinator, lb_id),
