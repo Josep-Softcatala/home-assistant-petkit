@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from petkitaio.model import Feeder, LitterBox, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -103,7 +103,7 @@ class WFWater(CoordinatorEntity, BinarySensorEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]

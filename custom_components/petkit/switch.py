@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import FeederSetting, LitterBoxCommand, LitterBoxSetting, PurifierSetting, W5Command
+from petkitaio.constants import FeederSetting, LitterBoxCommand, LitterBoxSetting, PurifierSetting, FountainCommand
 from petkitaio.exceptions import BluetoothError
-from petkitaio.model import Feeder, LitterBox, Purifier, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Purifier, Fountain
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -130,7 +130,7 @@ class WFLight(CoordinatorEntity, SwitchEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -197,7 +197,7 @@ class WFLight(CoordinatorEntity, SwitchEntity):
         """Turn light on."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.LIGHT_ON)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.LIGHT_ON)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning on the light again.')
         else:
@@ -210,7 +210,7 @@ class WFLight(CoordinatorEntity, SwitchEntity):
         """Turn light off."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.LIGHT_OFF)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.LIGHT_OFF)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning off the light again.')
         else:
@@ -227,7 +227,7 @@ class WFPower(CoordinatorEntity, SwitchEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -275,7 +275,10 @@ class WFPower(CoordinatorEntity, SwitchEntity):
     def is_on(self) -> bool:
         """Determine if water fountain is running."""
 
-        return self.wf_data.data['powerStatus'] == 1
+        if self.wf_data.type == 'w5':
+            return self.wf_data.data['powerStatus'] == 1
+        elif self.wf_data.type == 'ctw3':
+            return self.wf_data.data['status']['powerStatus'] == 1
 
     @property
     def available(self) -> bool:
@@ -298,16 +301,20 @@ class WFPower(CoordinatorEntity, SwitchEntity):
         """
 
         if self.wf_data.data['mode'] == 1:
-            command = W5Command.NORMAL
+            command = FountainCommand.NORMAL
         else:
-            command = W5Command.SMART
+            command = FountainCommand.SMART
 
         try:
             await self.coordinator.client.control_water_fountain(self.wf_data, command)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning on the water fountain again.')
         else:
-            self.wf_data.data['powerStatus'] = 1
+            if self.wf_data.type == 'w5':
+                self.wf_data.data['powerStatus'] = 1
+            elif self.wf_data.type == 'ctw3':
+                self.wf_data.data['status']['powerStatus'] = 1
+
             self.async_write_ha_state()
             await asyncio.sleep(1)
             await self.coordinator.async_request_refresh()
@@ -320,11 +327,15 @@ class WFPower(CoordinatorEntity, SwitchEntity):
         """
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.PAUSE)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.PAUSE)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning off the water fountain again.')
         else:
-            self.wf_data.data['powerStatus'] = 0
+            if self.wf_data.type == 'w5':
+                self.wf_data.data['powerStatus'] = 0
+            elif self.wf_data.type == 'ctw3':
+                self.wf_data.data['status']['powerStatus'] = 0
+
             self.async_write_ha_state()
             await asyncio.sleep(1)
             await self.coordinator.async_request_refresh()
@@ -337,7 +348,7 @@ class WFDisturb(CoordinatorEntity, SwitchEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -410,7 +421,7 @@ class WFDisturb(CoordinatorEntity, SwitchEntity):
         """Turn DND on."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.DO_NOT_DISTURB)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.DO_NOT_DISTURB)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning on Do Not Disturb again.')
         else:
@@ -423,7 +434,7 @@ class WFDisturb(CoordinatorEntity, SwitchEntity):
         """Turn DND off."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.DO_NOT_DISTURB_OFF)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.DO_NOT_DISTURB_OFF)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try turning off Do Not Disturb again.')
         else:
