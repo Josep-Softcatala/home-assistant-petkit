@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import FeederCommand, LitterBoxCommand, W5Command
+from petkitaio.constants import FeederCommand, LitterBoxCommand, FountainCommand
 from petkitaio.exceptions import BluetoothError
-from petkitaio.model import Feeder, LitterBox, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
@@ -110,7 +110,7 @@ class WFResetFilter(CoordinatorEntity, ButtonEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data."""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -168,7 +168,7 @@ class WFResetFilter(CoordinatorEntity, ButtonEntity):
         """Handle the button press."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.RESET_FILTER)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.RESET_FILTER)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try resetting filter again.')
         else:

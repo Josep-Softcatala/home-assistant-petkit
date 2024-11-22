@@ -5,7 +5,7 @@ from datetime import datetime
 from math import floor as floor
 from typing import Any
 
-from petkitaio.model import Feeder, LitterBox, Pet, Purifier, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Pet, Purifier, Fountain
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -193,7 +193,7 @@ class WFEnergyUse(CoordinatorEntity, SensorEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -268,7 +268,7 @@ class WFLastUpdate(CoordinatorEntity, SensorEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -348,7 +348,7 @@ class WFFilter(CoordinatorEntity, SensorEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -418,7 +418,7 @@ class WFPurifiedWater(CoordinatorEntity, SensorEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data"""
 
         return self.coordinator.data.water_fountains[self.wf_id]

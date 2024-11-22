@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import FeederSetting, LitterBoxSetting, W5Command
+from petkitaio.constants import FeederSetting, LitterBoxSetting, FountainCommand
 from petkitaio.exceptions import BluetoothError
-from petkitaio.model import Feeder, LitterBox, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
@@ -106,7 +106,7 @@ class WFLightBrightness(CoordinatorEntity, SelectEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data."""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -208,7 +208,7 @@ class WFMode(CoordinatorEntity, SelectEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data."""
 
         return self.coordinator.data.water_fountains[self.wf_id]

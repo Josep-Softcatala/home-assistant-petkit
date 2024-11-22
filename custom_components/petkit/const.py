@@ -5,7 +5,7 @@ import logging
 
 from aiohttp.client_exceptions import ClientConnectionError
 from petkitaio.exceptions import AuthError, PetKitError
-from petkitaio.constants import W5Command, PurifierCommand
+from petkitaio.constants import FountainCommand, PurifierCommand
 
 from homeassistant.const import Platform
 
@@ -292,9 +292,9 @@ REGIONS_LIST = [
 LIGHT_BRIGHTNESS_OPTIONS = ['low', 'medium', 'high']
 
 LIGHT_BRIGHTNESS_COMMAND = {
-    W5Command.LIGHT_LOW: "low",
-    W5Command.LIGHT_MEDIUM: "medium",
-    W5Command.LIGHT_HIGH: "high"
+    FountainCommand.LIGHT_LOW: "low",
+    FountainCommand.LIGHT_MEDIUM: "medium",
+    FountainCommand.LIGHT_HIGH: "high"
 }
 
 LIGHT_BRIGHTNESS_NAMED = {
@@ -311,8 +311,8 @@ WF_MODE_NAMED = {
 }
 
 WF_MODE_COMMAND = {
-    W5Command.NORMAL: "normal",
-    W5Command.SMART: "smart"
+    FountainCommand.NORMAL: "normal",
+    FountainCommand.SMART: "smart"
 }
 
 WATER_FOUNTAINS = {
