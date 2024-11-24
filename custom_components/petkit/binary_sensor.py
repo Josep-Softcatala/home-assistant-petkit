@@ -88,7 +88,7 @@ async def async_setup_entry(
                 LBManuallyPaused(coordinator, lb_id)
             )
 
-        # Pura MAX2
+        # Pura MAX2 and Purobot ULTRA
         if "boxState" in lb_data.device_detail["state"]:
             binary_sensors.append(LBBWastePresence(coordinator, lb_id))
 

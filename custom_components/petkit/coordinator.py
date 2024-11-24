@@ -27,16 +27,16 @@ class PetKitDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize the PetKit coordinator."""
 
         if entry.options[TIMEZONE] == "Set Automatically":
-            tz = None
+            tz = hass.config.time_zone
         else:
             tz = entry.options[TIMEZONE]
         try:
             self.client = PetKitClient(
                 entry.data[CONF_EMAIL],
                 entry.data[CONF_PASSWORD],
-                session=async_get_clientsession(hass),
                 region=entry.options[REGION],
                 timezone=tz,
+                session=async_get_clientsession(hass),
                 timeout=TIMEOUT,
             )
             super().__init__(

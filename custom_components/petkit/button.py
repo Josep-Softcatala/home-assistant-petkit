@@ -70,7 +70,7 @@ async def async_setup_entry(
     # Litter boxes
     for lb_id, lb_data in coordinator.data.litter_boxes.items():
         # Pura X & Pura MAX
-        if lb_data.type in ['t3', 't4']:
+        if lb_data.type in ['t3', 't4', 't6']:
             buttons.extend((
                 LBStartCleaning(coordinator, lb_id),
                 LBPauseCleaning(coordinator, lb_id)
@@ -82,7 +82,7 @@ async def async_setup_entry(
                 LBResetDeodorizer(coordinator, lb_id)
             ))
         # Pura MAX
-        if lb_data.type == 't4':
+        if lb_data.type in ['t4', 't6']:
             buttons.extend((
                 N50Reset(coordinator, lb_id),
                 MAXStartMaint(coordinator, lb_id),
