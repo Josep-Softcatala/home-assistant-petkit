@@ -1,35 +1,13 @@
-<h1 align="center">
-  <a href="https://petkit.com"><img src="https://raw.githubusercontent.com/RobertD502/home-assistant-petkit/main/logo.png" width="480"></a>
-  <br>
-  <i>PetKit Home Assistant Integration</i>
-  <br>
-  <h3 align="center">
-    <i> Custom Home Assistant component for controlling and monitoring PetKit devices and pets. </i>
-    <br>
-  </h3>
-</h1>
+# PetKit Home Assistant Integration
 
-<p align="center">
-  <a href="https://github.com/RobertD502/home-assistant-petkit/releases"><img src="https://img.shields.io/github/v/release/RobertD502/home-assistant-petkit?display_name=tag&include_prereleases&sort=semver" alt="Current version"></a>
-  <img alt="GitHub" src="https://img.shields.io/github/license/RobertD502/home-assistant-petkit">
-  <img alt="GitHub manifest.json dynamic (path)" src="https://img.shields.io/github/manifest-json/requirements/RobertD502/home-assistant-petkit%2Fmain%2Fcustom_components%2Fpetkit?label=requirements">
-  <img alt="Total lines count" src="https://tokei.rs/b1/github/RobertD502/home-assistant-petkit">
-</p>
+### FORK from [RobertD502/home-assistant-petkit](https://github.com/RobertD502/home-assistant-petkit)
+### Working on support more devices as : YumShare Dual Hopper (D4SH), Eversweet MAX (CTW3), Purobot ULTRA (T6)
 
-<p align="center">
-  <a href="https://www.buymeacoffee.com/RobertD502" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="90" width="381.6"></a>
-  <a href="https://liberapay.com/RobertD502/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg" height="90" width="270"></a>
-</p>
+* D4SH Yumshare Dual Hopper is fully supported, information & command (no video)
+* Eversweet MAX is partially supported, get info from the device but can't control it
+* PUROBOT Ultra is partially supported
 
-### A lot of work has been put into creating the backend and this integration. If you enjoy this integration, consider donating by clicking on one of the supported methods above.
-
-***All proceeds go towards helping a local animal rescue.**
-
-___
-## Discord Server
-<a href="https://discord.gg/FXrmHaapf3"><img alt="Discord" src="http://invidget.switchblade.xyz/FXrmHaapf3"></a>
-
-Join the Home Assistant PetKit discord server to follow development news or to share ideas with other users.
+### I'm working actively on this project, some features may not work as expected, please report any issue you find. If you want stable version please use the original one from RobertD502
 
 ## Currently Supported Devices
 
