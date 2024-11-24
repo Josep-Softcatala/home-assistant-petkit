@@ -119,7 +119,7 @@ async def async_setup_entry(
         if feeder_data.type == 'd4sh':
             # Unknow information about D4sh Feeder
             sensors.extend((
-                Bowl(coordinator, feeder_id),
+                FoodBowlPercentage(coordinator, feeder_id),
                 EndDateCarePlusSubscription(coordinator, feeder_id),
             ))
 
@@ -161,6 +161,14 @@ async def async_setup_entry(
             sensors.extend((
                 MAXLastEvent(coordinator, lb_id),
                 MAXWorkState(coordinator, lb_id)
+            ))
+        # Purobot
+        if lb_data.type == 't6':
+            sensors.extend((
+                LBLitterLevel(coordinator, lb_id),
+                LBRSSI(coordinator, lb_id),
+                LBError(coordinator, lb_id),
+                LBStatus(coordinator, lb_id),
             ))
 
     # Pets
@@ -4149,7 +4157,7 @@ class FoodLeft(CoordinatorEntity, SensorEntity):
         return PERCENTAGE
 
 
-class Bowl(CoordinatorEntity, SensorEntity):
+class FoodBowlPercentage(CoordinatorEntity, SensorEntity):
     """Representation of feeder ????"""
 
     def __init__(self, coordinator, feeder_id):
@@ -4190,13 +4198,13 @@ class Bowl(CoordinatorEntity, SensorEntity):
     def translation_key(self) -> str:
         """Translation key for this entity."""
 
-        return "bowl"
+        return "food_in_bowl"
 
     @property
     def native_value(self) -> int:
-        """Return total manually dispensed."""
+        """Return total manually dispensed, clamped between 0 and 100."""
 
-        return self.feeder_data.data["state"]["bowl"]
+        return max(0, min(100, self.feeder_data.data["state"]["bowl"]))
 
     @property
     def state_class(self) -> SensorStateClass:
@@ -4205,10 +4213,9 @@ class Bowl(CoordinatorEntity, SensorEntity):
         return SensorStateClass.MEASUREMENT
 
     @property
-    def entity_category(self) -> EntityCategory:
-        """Set category to diagnostic."""
-
-        return EntityCategory.DIAGNOSTIC
+    def native_unit_of_measurement(self) -> str:
+        """Return percent as the native unit."""
+        return PERCENTAGE
 
     @property
     def icon(self) -> str:
