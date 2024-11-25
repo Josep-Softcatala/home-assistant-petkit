@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import PurifierCommand
-from petkitaio.model import Purifier
+from petkit_api.constants import PurifierCommand
+from petkit_api.model import Purifier
 
 from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry

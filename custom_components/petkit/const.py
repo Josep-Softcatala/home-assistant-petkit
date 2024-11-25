@@ -4,15 +4,15 @@ import asyncio
 import logging
 
 from aiohttp.client_exceptions import ClientConnectionError
-from petkitaio.exceptions import AuthError, PetKitError
-from petkitaio.constants import FountainCommand, PurifierCommand
+from petkit_api.exceptions import AuthError, PetKitError
+from petkit_api.constants import FountainCommand, PurifierCommand
 
 from homeassistant.const import Platform
 
 LOGGER = logging.getLogger(__package__)
 
-
 DOMAIN = "petkit"
+
 PLATFORMS = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,

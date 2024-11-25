@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from petkitaio.constants import FeederSetting, LitterBoxSetting, PetSetting
-from petkitaio.exceptions import PetKitError
-from petkitaio.model import Feeder, LitterBox, Pet
+from petkit_api.constants import FeederSetting, LitterBoxSetting, PetSetting
+from petkit_api.exceptions import PetKitError
+from petkit_api.model import Feeder, LitterBox, Pet
 
 from homeassistant.components.number import (
     NumberDeviceClass,

@@ -5,7 +5,7 @@ from datetime import datetime
 from math import floor as floor
 from typing import Any
 
-from petkitaio.model import Feeder, LitterBox, Pet, Purifier, Fountain
+from petkit_api.model import Feeder, LitterBox, Pet, Purifier, Fountain
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,

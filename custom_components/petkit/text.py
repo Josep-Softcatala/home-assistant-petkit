@@ -1,7 +1,7 @@
 """Text platform for PetKit integration."""
 from __future__ import annotations
 
-from petkitaio.model import Feeder
+from petkit_api.model import Feeder
 
 from homeassistant.components.text import TextEntity
 from homeassistant.config_entries import ConfigEntry

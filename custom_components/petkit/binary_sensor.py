@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from petkitaio.model import Feeder, LitterBox, Fountain
+from petkit_api.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry

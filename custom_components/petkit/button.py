@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import FeederCommand, LitterBoxCommand, FountainCommand
-from petkitaio.exceptions import BluetoothError
-from petkitaio.model import Feeder, LitterBox, Fountain
+from petkit_api.constants import FeederCommand, LitterBoxCommand, FountainCommand
+from petkit_api.exceptions import BluetoothError
+from petkit_api.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
