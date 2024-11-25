@@ -1,6 +1,7 @@
 """PetKit Component."""
 from __future__ import annotations
 
+import pycountry
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
@@ -40,6 +41,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Migrate old entry."""
 
+    default_country = pycountry.countries.get(alpha_2=hass.config.country).name
+    default_tz = hass.config.time_zone
+
     if entry.version == 1:
         email = entry.data[CONF_EMAIL]
         password = entry.data[CONF_PASSWORD]
@@ -54,8 +58,8 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 CONF_PASSWORD: password,
             },
             options={
-                REGION: None,
-                TIMEZONE: "Set Automatically",
+                REGION: default_country,
+                TIMEZONE: default_tz,
                 POLLING_INTERVAL: 120,
             },
         )
@@ -76,8 +80,8 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 CONF_PASSWORD: password,
             },
             options={
-                REGION: None,
-                TIMEZONE: "Set Automatically",
+                REGION: default_country,
+                TIMEZONE: default_tz,
                 POLLING_INTERVAL: polling_interval,
             },
         )
@@ -100,7 +104,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             },
             options={
                 REGION: region,
-                TIMEZONE: "Set Automatically",
+                TIMEZONE: default_tz,
                 POLLING_INTERVAL: polling_interval,
             },
         )

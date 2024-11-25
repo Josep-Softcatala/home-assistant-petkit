@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import Any
 import async_timeout
 
-from petkitaio import PetKitClient
-from petkitaio.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
+from petkit_api import PetKitClient
+from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -15,17 +15,12 @@ from .const import LOGGER, PETKIT_ERRORS, TIMEOUT
 
 async def async_validate_api(hass: HomeAssistant, email: str, password: str, region: str, timezone: str) -> bool:
     """Get data from API."""
-
-    if timezone == "Set Automatically":
-        tz = None
-    else:
-        tz = timezone
     client = PetKitClient(
         email,
         password,
-        session=async_get_clientsession(hass),
         region=region,
-        timezone=tz,
+        timezone=timezone,
+        session=async_get_clientsession(hass),
         timeout=TIMEOUT,
     )
     try:

@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from petkitaio import PetKitClient
-from petkitaio.exceptions import AuthError, PetKitError, RegionError, ServerError
-from petkitaio.model import PetKitData
+from petkit_api import PetKitClient
+from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError
+from petkit_api.model import PetKitData
 
 
 from homeassistant.config_entries import ConfigEntry
@@ -25,17 +25,13 @@ class PetKitDataUpdateCoordinator(DataUpdateCoordinator):
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize the PetKit coordinator."""
-
-        if entry.options[TIMEZONE] == "Set Automatically":
-            tz = hass.config.time_zone
-        else:
-            tz = entry.options[TIMEZONE]
         try:
+            LOGGER.debug(f'Creating PetKit client with email: {entry.data[CONF_EMAIL]}, region: {entry.options[REGION]}, timezone: {entry.options[TIMEZONE]}')
             self.client = PetKitClient(
                 entry.data[CONF_EMAIL],
                 entry.data[CONF_PASSWORD],
                 region=entry.options[REGION],
-                timezone=tz,
+                timezone=entry.options[TIMEZONE],
                 session=async_get_clientsession(hass),
                 timeout=TIMEOUT,
             )

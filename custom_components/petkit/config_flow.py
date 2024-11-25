@@ -4,8 +4,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from petkitaio.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
+from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
 import voluptuous as vol
+import pycountry
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
@@ -14,24 +15,10 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 import homeassistant.helpers.config_validation as cv
 
+from . import LOGGER
 from .const import DEFAULT_NAME, DOMAIN, POLLING_INTERVAL, REGION, REGIONS_LIST, TIMEZONE
 from .timezones import TIMEZONES
 from .util import NoDevicesError, async_validate_api
-
-
-DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_EMAIL): cv.string,
-        vol.Required(CONF_PASSWORD): cv.string,
-        vol.Required(REGION): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=REGIONS_LIST),
-        ),
-        vol.Required(TIMEZONE): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=TIMEZONES),
-        )
-        
-    }
-)
 
 
 class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -59,7 +46,9 @@ class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Confirm re-authentication with PetKit."""
-
+        default_country = pycountry.countries.get(alpha_2=self.hass.config.country).name
+        default_tz = self.hass.config.time_zone
+        LOGGER.debug(f'Default country: {default_country}, Default timezone: {default_tz}')
         errors: dict[str, str] = {}
 
         if user_input:
@@ -104,9 +93,22 @@ class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.hass.config_entries.async_reload(self.entry.entry_id)
                 return self.async_abort(reason="reauth_successful")
 
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_EMAIL): cv.string,
+                vol.Required(CONF_PASSWORD): cv.string,
+                vol.Required(REGION, default=default_country): selector.SelectSelector(
+                    selector.SelectSelectorConfig(options=REGIONS_LIST),
+                ),
+                vol.Required(TIMEZONE, default=default_tz): selector.SelectSelector(
+                    selector.SelectSelectorConfig(options=TIMEZONES),
+                )
+            }
+        )
+
         return self.async_show_form(
             step_id="reauth_confirm",
-            data_schema=DATA_SCHEMA,
+            data_schema=data_schema,
             errors=errors,
         )
 
@@ -114,6 +116,9 @@ class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
+        default_country = pycountry.countries.get(alpha_2=self.hass.config.country).name
+        default_tz = self.hass.config.time_zone
+        LOGGER.debug(f'Default country: {default_country}, Default timezone: {default_tz}')
 
         errors: dict[str, str] = {}
 
@@ -156,9 +161,22 @@ class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     }
                 )
 
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_EMAIL): cv.string,
+                vol.Required(CONF_PASSWORD): cv.string,
+                vol.Required(REGION, default=default_country): selector.SelectSelector(
+                    selector.SelectSelectorConfig(options=REGIONS_LIST),
+                ),
+                vol.Required(TIMEZONE, default=default_tz): selector.SelectSelector(
+                    selector.SelectSelectorConfig(options=TIMEZONES),
+                )
+            }
+        )
+
         return self.async_show_form(
             step_id="user",
-            data_schema=DATA_SCHEMA,
+            data_schema=data_schema,
             errors=errors,
         )
 
@@ -176,6 +194,11 @@ class PetKitOptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_petkit_options(self, user_input=None):
         """Manage the PetKit options."""
+        default_country = pycountry.countries.get(alpha_2=self.hass.config.country).name
+        default_tz = self.hass.config.time_zone
+
+        LOGGER.debug(f'Default country: {default_country}, Default timezone: {default_tz}')
+
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
@@ -183,7 +206,7 @@ class PetKitOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required(
                 REGION,
                 default=self.config_entry.options.get(
-                    REGION, None
+                    REGION, default_country
                 ),
             ): selector.SelectSelector(
                     selector.SelectSelectorConfig(options=REGIONS_LIST)
@@ -191,7 +214,7 @@ class PetKitOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Required(
                 TIMEZONE,
                 default=self.config_entry.options.get(
-                    TIMEZONE, "Set Automatically"
+                    TIMEZONE, default_tz
                 ),
             ): selector.SelectSelector(
                     selector.SelectSelectorConfig(options=TIMEZONES)

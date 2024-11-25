@@ -1,7 +1,5 @@
 """List of valid timezones that users can use as a fallback if their system timezone isn't recognized by the tzlocal library."""
-
 TIMEZONES = [
-"Set Automatically",
 "Africa/Abidjan",
 "Africa/Accra",
 "Africa/Addis_Ababa",
