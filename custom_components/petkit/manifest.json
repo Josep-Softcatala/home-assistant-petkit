@@ -14,7 +14,7 @@
     "petkitaio"
   ],
   "requirements": [
-    "git+https://github.com/Jezza34000/petkitaio@t6-support",
+    "petkitaio @ git+https://github.com/Jezza34000/petkitaio@main",
     "tzlocal==5.1"
   ],
   "version": "0.1.12.4"

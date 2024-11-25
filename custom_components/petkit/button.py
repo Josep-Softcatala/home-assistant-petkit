@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
-from petkitaio.constants import FeederCommand, LitterBoxCommand, W5Command
+from petkitaio.constants import FeederCommand, LitterBoxCommand, FountainCommand
 from petkitaio.exceptions import BluetoothError
-from petkitaio.model import Feeder, LitterBox, W5Fountain
+from petkitaio.model import Feeder, LitterBox, Fountain
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
@@ -70,7 +70,7 @@ async def async_setup_entry(
     # Litter boxes
     for lb_id, lb_data in coordinator.data.litter_boxes.items():
         # Pura X & Pura MAX
-        if lb_data.type in ['t3', 't4']:
+        if lb_data.type in ['t3', 't4', 't6']:
             buttons.extend((
                 LBStartCleaning(coordinator, lb_id),
                 LBPauseCleaning(coordinator, lb_id)
@@ -82,7 +82,7 @@ async def async_setup_entry(
                 LBResetDeodorizer(coordinator, lb_id)
             ))
         # Pura MAX
-        if lb_data.type == 't4':
+        if lb_data.type in ['t4', 't6']:
             buttons.extend((
                 N50Reset(coordinator, lb_id),
                 MAXStartMaint(coordinator, lb_id),
@@ -110,7 +110,7 @@ class WFResetFilter(CoordinatorEntity, ButtonEntity):
         self.wf_id = wf_id
 
     @property
-    def wf_data(self) -> W5Fountain:
+    def wf_data(self) -> Fountain:
         """Handle coordinator Water Fountain data."""
 
         return self.coordinator.data.water_fountains[self.wf_id]
@@ -168,7 +168,7 @@ class WFResetFilter(CoordinatorEntity, ButtonEntity):
         """Handle the button press."""
 
         try:
-            await self.coordinator.client.control_water_fountain(self.wf_data, W5Command.RESET_FILTER)
+            await self.coordinator.client.control_water_fountain(self.wf_data, FountainCommand.RESET_FILTER)
         except BluetoothError:
             raise PetKitBluetoothError(f'Bluetooth connection to {self.wf_data.data["name"]} failed. Please try resetting filter again.')
         else:
