@@ -2,20 +2,20 @@
   "domain": "petkit",
   "name": "PetKit",
   "codeowners": [
-    "@RobertD502"
+    "@Jezza34000"
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/RobertD502/home-assistant-petkit/blob/main/README.md",
+  "documentation": "https://github.com/Jezza34000/home-assistant-petkit/blob/main/README.md",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/RobertD502/home-assistant-petkit/issues",
+  "issue_tracker": "https://github.com/Jezza34000/home-assistant-petkit/issues",
   "loggers": [
-    "petkitaio"
+    "petkit_api"
   ],
   "requirements": [
-    "petkitaio @ git+https://github.com/Jezza34000/petkitaio@main",
+    "petkit-api==0.1.1",
     "tzlocal==5.1"
   ],
-  "version": "0.1.12.4"
+  "version": "1.0.0"
 }
