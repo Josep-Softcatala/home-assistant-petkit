@@ -81,14 +81,10 @@ async def async_setup_entry(
                 LBOdorRemoval(coordinator, lb_id),
                 LBResetDeodorizer(coordinator, lb_id)
             ))
-        # Pura MAX
-        if lb_data.type in ['t4', 't6']:
+        # Purobot ULTRA
+        if lb_data.type == 't6':
             buttons.extend((
-                N50Reset(coordinator, lb_id),
-                MAXStartMaint(coordinator, lb_id),
-                MAXExitMaint(coordinator, lb_id),
-                MAXPauseExitMaint(coordinator, lb_id),
-                MAXResumeExitMaint(coordinator, lb_id),
+                DeodorizerReset(coordinator, lb_id),
                 MAXDumpLitter(coordinator, lb_id),
                 MAXPauseDumping(coordinator, lb_id),
                 MAXResumeDumping(coordinator, lb_id)
@@ -98,6 +94,13 @@ async def async_setup_entry(
                 buttons.append(
                     MAXLightOn(coordinator, lb_id)
                 )
+        if lb_data.type == 't4':
+            buttons.extend((
+                MAXStartMaint(coordinator, lb_id),
+                MAXExitMaint(coordinator, lb_id),
+                MAXPauseExitMaint(coordinator, lb_id),
+                MAXResumeExitMaint(coordinator, lb_id)
+            ))
 
     async_add_entities(buttons)
 
@@ -670,8 +673,8 @@ class LBResetDeodorizer(CoordinatorEntity, ButtonEntity):
         await self.coordinator.async_request_refresh()
 
 
-class N50Reset(CoordinatorEntity, ButtonEntity):
-    """Representation of Pura MAX N50 deodorant reset."""
+class DeodorizerReset(CoordinatorEntity, ButtonEntity):
+    """Representation of Litter deodorant reset."""
 
     def __init__(self, coordinator, lb_id):
         super().__init__(coordinator)
@@ -699,7 +702,7 @@ class N50Reset(CoordinatorEntity, ButtonEntity):
     def unique_id(self) -> str:
         """Sets unique ID for this entity."""
 
-        return str(self.lb_data.id) + '_n50_reset'
+        return str(self.lb_data.id) + '_deodorizer_reset'
 
     @property
     def has_entity_name(self) -> bool:
@@ -711,7 +714,7 @@ class N50Reset(CoordinatorEntity, ButtonEntity):
     def translation_key(self) -> str:
         """Translation key for this entity."""
 
-        return "n50_reset"
+        return "deodorizer_reset"
 
     @property
     def icon(self) -> str:

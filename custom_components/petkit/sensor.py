@@ -1482,7 +1482,7 @@ class LBDeodorizerLevel(CoordinatorEntity, SensorEntity):
 
         #Pura MAX uses N50 deodorizer and not liquid
         if self.lb_data.type == 't4':
-            return "n50_odor_eliminator"
+            return "odor_eliminator"
         else:
             return "deodorizer_level"
 

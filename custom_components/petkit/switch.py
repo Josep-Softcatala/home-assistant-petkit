@@ -18,6 +18,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, FEEDERS, LITTER_BOXES, PETKIT_COORDINATOR, PURIFIERS, WATER_FOUNTAINS
 from .coordinator import PetKitDataUpdateCoordinator
 from .exceptions import PetKitBluetoothError
+from .select import Sound
 
 
 async def async_setup_entry(
@@ -62,11 +63,11 @@ async def async_setup_entry(
                     PetEatNotif(coordinator, feeder_id),
                     PetVisitNotif(coordinator, feeder_id),
                     SurplusControl(coordinator, feeder_id),
-                    Camera(coordinator, feeder_id),
-                    NightVision(coordinator, feeder_id),
-                    Microphone(coordinator, feeder_id),
+                    FeederCamera(coordinator, feeder_id),
+                    FeederNightVision(coordinator, feeder_id),
+                    FeederMicrophone(coordinator, feeder_id),
                     LowBatteryNotif(coordinator, feeder_id),
-                    SystemSound(coordinator, feeder_id),
+                    FeederSystemSound(coordinator, feeder_id),
                     VoiceDispense(coordinator, feeder_id),
                 )
             )
@@ -75,7 +76,7 @@ async def async_setup_entry(
         if feeder_data.type == 'd3':
             switches.extend((
                 VoiceDispense(coordinator, feeder_id),
-                DoNotDisturb(coordinator, feeder_id),
+                FeederDoNotDisturb(coordinator, feeder_id),
                 SurplusControl(coordinator, feeder_id),
                 SystemNotification(coordinator, feeder_id),
             ))
@@ -111,6 +112,14 @@ async def async_setup_entry(
                 switches.append(
                     LBDeepDeodor(coordinator, lb_id)
                 )
+        # Purobot ULTRA
+        if lb_data.type == 't6':
+            switches.extend((
+                LBCamera(coordinator, lb_id),
+                LBNightVision(coordinator, lb_id),
+                LBMicrophone(coordinator, lb_id),
+                LBSystemSound(coordinator, lb_id),
+            ))
 
     # Purifiers
     for purifier_id, purifier_data in coordinator.data.purifiers.items():
@@ -929,7 +938,7 @@ class VoiceDispense(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class DoNotDisturb(CoordinatorEntity, SwitchEntity):
+class FeederDoNotDisturb(CoordinatorEntity, SwitchEntity):
     """Representation of D3 Feeder DND."""
 
     def __init__(self, coordinator, feeder_id):
@@ -3053,7 +3062,7 @@ class PetEatNotif(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class Camera(CoordinatorEntity, SwitchEntity):
+class FeederCamera(CoordinatorEntity, SwitchEntity):
     """Representation of Feeder indicator Camera switch."""
 
     def __init__(self, coordinator, feeder_id):
@@ -3141,6 +3150,7 @@ class Camera(CoordinatorEntity, SwitchEntity):
         self.feeder_data.data["settings"]["camera"] = 0
         self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
+
 
 
 class LowBatteryNotif(CoordinatorEntity, SwitchEntity):
@@ -3237,7 +3247,7 @@ class LowBatteryNotif(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class Microphone(CoordinatorEntity, SwitchEntity):
+class FeederMicrophone(CoordinatorEntity, SwitchEntity):
     """Representation of Feeder indicator Microphone switch."""
 
     def __init__(self, coordinator, feeder_id):
@@ -3333,7 +3343,7 @@ class Microphone(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class NightVision(CoordinatorEntity, SwitchEntity):
+class FeederNightVision(CoordinatorEntity, SwitchEntity):
     """Representation of Feeder indicator Microphone switch."""
 
     def __init__(self, coordinator, feeder_id):
@@ -3429,7 +3439,7 @@ class NightVision(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_request_refresh()
 
 
-class SystemSound(CoordinatorEntity, SwitchEntity):
+class FeederSystemSound(CoordinatorEntity, SwitchEntity):
     """Representation of D4sh system sound."""
 
     def __init__(self, coordinator, feeder_id):
@@ -3520,4 +3530,271 @@ class SystemSound(CoordinatorEntity, SwitchEntity):
         self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
 
+class LBCamera(CoordinatorEntity, SwitchEntity):
+    """Representation of Litter Box Camera switch."""
 
+    def __init__(self, coordinator, lb_id):
+        super().__init__(coordinator)
+        self.lb_id = lb_id
+
+    @property
+    def lb_data(self) -> LitterBox:
+        """Handle coordinator Litter Box data."""
+        return self.coordinator.data.litter_boxes[self.lb_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.lb_data.id)},
+            "name": self.lb_data.device_detail['name'],
+            "manufacturer": "PetKit",
+            "model": LITTER_BOXES[self.lb_data.type],
+            "sw_version": f'{self.lb_data.device_detail["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.lb_data.id) + '_camera'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "camera"
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        return 'mdi:camera'
+
+    @property
+    def is_on(self) -> bool:
+        """Determine if camera is on."""
+        return self.lb_data.device_detail['settings']['camera'] == 1
+
+    @property
+    def available(self) -> bool:
+        """Only make available if device is online."""
+        return self.lb_data.device_detail['state']['pim'] != 0
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn camera on."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.CAMERA, 1)
+        self.lb_data.device_detail['settings']['camera'] = 1
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn camera off."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.CAMERA, 0)
+        self.lb_data.device_detail['settings']['camera'] = 0
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+
+class LBNightVision(CoordinatorEntity, SwitchEntity):
+    """Representation of Litter Box Night Vision switch."""
+
+    def __init__(self, coordinator, lb_id):
+        super().__init__(coordinator)
+        self.lb_id = lb_id
+
+    @property
+    def lb_data(self) -> LitterBox:
+        """Handle coordinator Litter Box data."""
+        return self.coordinator.data.litter_boxes[self.lb_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.lb_data.id)},
+            "name": self.lb_data.device_detail['name'],
+            "manufacturer": "PetKit",
+            "model": LITTER_BOXES[self.lb_data.type],
+            "sw_version": f'{self.lb_data.device_detail["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.lb_data.id) + '_night_vision'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "night_vision"
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        return 'mdi:weather-night'
+
+    @property
+    def is_on(self) -> bool:
+        """Determine if night vision is on."""
+        return self.lb_data.device_detail['settings']['night'] == 1
+
+    @property
+    def available(self) -> bool:
+        """Only make available if device is online."""
+        return self.lb_data.device_detail['state']['pim'] != 0
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn night vision on."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.NIGHT, 1)
+        self.lb_data.device_detail['settings']['night'] = 1
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn night vision off."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.NIGHT, 0)
+        self.lb_data.device_detail['settings']['night'] = 0
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+class LBMicrophone(CoordinatorEntity, SwitchEntity):
+    """Representation of Litter Box Microphone switch."""
+
+    def __init__(self, coordinator, lb_id):
+        super().__init__(coordinator)
+        self.lb_id = lb_id
+
+    @property
+    def lb_data(self) -> LitterBox:
+        """Handle coordinator Litter Box data."""
+        return self.coordinator.data.litter_boxes[self.lb_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.lb_data.id)},
+            "name": self.lb_data.device_detail['name'],
+            "manufacturer": "PetKit",
+            "model": LITTER_BOXES[self.lb_data.type],
+            "sw_version": f'{self.lb_data.device_detail["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.lb_data.id) + '_microphone'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "microphone"
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        return 'mdi:microphone'
+
+    @property
+    def is_on(self) -> bool:
+        """Determine if microphone is on."""
+        return self.lb_data.device_detail['settings']['microphone'] == 1
+
+    @property
+    def available(self) -> bool:
+        """Only make available if device is online."""
+        return self.lb_data.device_detail['state']['pim'] != 0
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn microphone on."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.MICROPHONE, 1)
+        self.lb_data.device_detail['settings']['microphone'] = 1
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn microphone off."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.MICROPHONE, 0)
+        self.lb_data.device_detail['settings']['microphone'] = 0
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+class LBSystemSound(CoordinatorEntity, SwitchEntity):
+    """Representation of Litter Box System Sound switch."""
+
+    def __init__(self, coordinator, lb_id):
+        super().__init__(coordinator)
+        self.lb_id = lb_id
+
+    @property
+    def lb_data(self) -> LitterBox:
+        """Handle coordinator Litter Box data."""
+        return self.coordinator.data.litter_boxes[self.lb_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.lb_data.id)},
+            "name": self.lb_data.device_detail['name'],
+            "manufacturer": "PetKit",
+            "model": LITTER_BOXES[self.lb_data.type],
+            "sw_version": f'{self.lb_data.device_detail["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.lb_data.id) + '_system_sound'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "system_sound"
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+        return 'mdi:volume-high'
+
+    @property
+    def is_on(self) -> bool:
+        """Determine if system sound is on."""
+        return self.lb_data.device_detail['settings']['systemSoundEnable'] == 1
+
+    @property
+    def available(self) -> bool:
+        """Only make available if device is online."""
+        return self.lb_data.device_detail['state']['pim'] != 0
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn system sound on."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.SYSTEM_SOUND, 1)
+        self.lb_data.device_detail['settings']['systemSoundEnable'] = 1
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn system sound off."""
+        await self.coordinator.client.update_litter_box_settings(self.lb_data, LitterBoxSetting.SYSTEM_SOUND, 0)
+        self.lb_data.device_detail['settings']['systemSoundEnable'] = 0
+        self.async_write_ha_state()
+        await self.coordinator.async_request_refresh()
