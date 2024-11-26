@@ -17,8 +17,6 @@
 - [Fresh Element Mini Pro](https://www.amazon.com/PETKIT-Automatic-Stainless-Indicator-Dispenser-2-8L/dp/B08GS1CPHH/)
 - [Fresh Element Gemini](https://www.amazon.com/PETKIT-Automatic-Combination-Dispenser-Stainless/dp/B0BF56RTQH)
 - [Fresh Element](https://petkit.us/products/petkit-element-wi-fi-enabled-smart-pet-food-container-feeder)
-> [!CAUTION]
-> YumShare feeders are **NOT** currently supported, but will be in the future. Once they are supported this message will be removed.
 
 `Litter Boxes`
 - [Pura X Litter Box](https://www.amazon.com/PETKIT-Self-Cleaning-Scooping-Automatic-Multiple/dp/B08T9CCP1M)
