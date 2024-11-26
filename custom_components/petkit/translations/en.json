@@ -126,8 +126,8 @@
         "reset_pura_air_liquid": {
           "name": "Reset Pura Air liquid"
         },
-        "n50_reset": {
-          "name": "Reset N50 odor eliminator"
+        "deodorizer_reset": {
+          "name": "Reset odor eliminator"
         },
         "light_on": {
           "name": "Turn light ON"
@@ -458,8 +458,8 @@
         "pura_air_liquid": {
           "name": "Pura Air liquid"
         },
-        "n50_odor_eliminator": {
-          "name": "N50 odor eliminator"
+        "odor_eliminator": {
+          "name": "Odor eliminator"
         },
         "max_last_event": {
           "name": "Last event",
