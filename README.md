@@ -279,6 +279,60 @@ Each Feeder has the following entities:
 
 </details>
 
+<details>
+  <summary> <b>Yumshare Dual Hopper</b> (<i>click to expand</i>)</summary>
+  <!---->
+<br/>
+Each Feeder has the following entities:
+<br/>
+
+| Entity                     | Entity Type     | Additional Comments                                                                                                                                                                                   |
+|----------------------------|-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Cancel manual feed`       | `Button`        | - Only available if your feeder is online (connected to PetKit's servers). <br/>- Will cancel a manual feeding that is currently in progress.                                                         |
+| `Indicator light`          | `Switch`        | Only available if your feeder is online (connected to PetKit's servers).                                                                                                                              |
+| `Manual feed`              | `Number`        | - Allows setting the amount of food (grams) to dispense immediately. <br/>- Only available if your feeder is online (connected to PetKit's servers).                                                  |
+| `Desiccant days remaining` | `Sensor`        | Number of days left before the desiccant needs to be replaced.                                                                                                                                        |
+| `Food level`               | `Binary Sensor` | Allows for determining if there is a food shortage.                                                                                                                                                   |
+| `Child lock`               | `Switch`        | Only available if your feeder is online (connected to PetKit's servers).                                                                                                                              |
+| `Reset desiccant`          | `Button`        | - Allows you to reset the desiccant back to 30 days after replacing it. <br/>- Only available if your feeder is online (connected to PetKit's servers).                                               |
+| `Battery status`           | `Sensor`        | - Will only become available when feeder is running on batteries. <br/>- Indicates the battery level (Normal or Low).                                                                                 |
+| `Error`                    | `Sensor`        | Identifies any errors reported by the feeder.                                                                                                                                                         |
+| `Food Left`                | `Sensor`        | Identifies the amount of food, as a percentage, left in the feeder.                                                                                                                                   |
+| `RSSI`                     | `Sensor`        | WiFi connection strength.                                                                                                                                                                             |
+| `Status`                   | `Sensor`        | `Normal` = Feeder is connected to PetKit's servers <br/>`Offline` = Feeder is not connected to PetKit servers <br/>`On Batteries` = If installed, feeder is currently being powered by the batteries. |
+
+
+How to add the schedule card to your Lovelace dashboard:
+
+Add this card to your HA with HACS :  https://github.com/cristianchelu/dispenser-schedule-card
+
+On config card paste this :
+
+```yaml
+type: custom:dispenser-schedule-card
+entity: sensor.yumshare_raw_feed_plan_data
+editable: never
+alternate_unit:
+  unit_of_measurement: g
+  conversion_factor: 10
+  approximate: true
+```
+> [!NOTE]
+> `Note :` You can't use actions or switch function on this card with the YumShare, it's only for display purpose.
+
+You will get a card like this :
+
+<a href=""><img src="https://raw.githubusercontent.com/Jezza34000/home-assistant-petkit/main/images/schedule.png"></a>
+
+Possible states for the schedule card :
+
+- **Dispensed** : The amount of food that has been dispensed, including manual feedings
+- **Skipped** : The amount of food that has been skipped, due to Surplus Control, or manual cancelation
+- **Failed** : The amount of food that has failed to dispense
+- **Pending** : The amount of food that is pending to be dispensed
+
+</details>
+
 
 ## Water Fountains
 ___
