@@ -112,15 +112,16 @@ async def async_setup_entry(
                 PlannedDispensedHopper1(coordinator, feeder_id),
                 PlannedDispensedHopper2(coordinator, feeder_id),
                 TotalDispensedHopper1(coordinator, feeder_id),
-                TotalDispensedHopper2(coordinator, feeder_id)
+                TotalDispensedHopper2(coordinator, feeder_id),
             ))
 
         # D4sh Feeder
         if feeder_data.type == 'd4sh':
-            # Unknow information about D4sh Feeder
             sensors.extend((
                 FoodBowlPercentage(coordinator, feeder_id),
                 EndDateCarePlusSubscription(coordinator, feeder_id),
+                TimesVisited(coordinator, feeder_id),
+                FeederRawPlanData(coordinator, feeder_id),
             ))
 
         # Fresh Element Feeder
@@ -2364,16 +2365,17 @@ class PetRecentWeight(CoordinatorEntity, SensorEntity, RestoreEntity):
         weight_dict: dict[int, int] = {}
 
         for lb_id, lb_data in self.litter_boxes.items():
-            if lb_data.statistics['statisticInfo']:
+            if 'statisticInfo' in lb_data.statistics:
                 try:
-                    final_idx = max(index for index, stat in enumerate(lb_data.statistics['statisticInfo']) if stat['petId'] == self.pet_data.id)
+                    final_idx = max(index for index, stat in enumerate(lb_data.statistics['statisticInfo']) if stat.get('petId') == self.pet_data.id)
                 except ValueError:
                     continue
                 else:
                     last_stat = lb_data.statistics['statisticInfo'][final_idx]
-                    weight = last_stat['petWeight']
-                    time = last_stat['xTime']
-                    weight_dict[time] = weight
+                    weight = last_stat.get('petWeight')
+                    time = last_stat.get('xTime')
+                    if weight is not None and time is not None:
+                        weight_dict[time] = weight
         sorted_dict = dict(sorted(weight_dict.items()))
         return sorted_dict
 
@@ -4343,3 +4345,143 @@ class LBStatus(CoordinatorEntity, SensorEntity):
             return 'mdi:cloud'
         else:
             return None
+
+
+class TimesVisited(CoordinatorEntity, SensorEntity):
+    """Representation of amount of times pet ate today."""
+
+    def __init__(self, coordinator, feeder_id):
+        super().__init__(coordinator)
+        self.feeder_id = feeder_id
+
+    @property
+    def feeder_data(self) -> Feeder:
+        """Handle coordinator Feeder data."""
+
+        return self.coordinator.data.feeders[self.feeder_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+
+        return {
+            "identifiers": {(DOMAIN, self.feeder_data.id)},
+            "name": self.feeder_data.data['name'],
+            "manufacturer": "PetKit",
+            "model": FEEDERS[self.feeder_data.type],
+            "sw_version": f'{self.feeder_data.data["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+
+        return str(self.feeder_data.id) + '_times_visited'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+
+        return "times_visited"
+
+    @property
+    def native_value(self) -> int:
+        """Return total times eaten."""
+        pet_records = self.feeder_data.device_record.get('pet', [])
+        if pet_records and 'items' in pet_records[0]:
+            return len(pet_records[0]['items'])
+        return 0
+
+    @property
+    def state_class(self) -> SensorStateClass:
+        """Return the type of state class."""
+
+        return SensorStateClass.MEASUREMENT
+
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to diagnostic."""
+
+        return EntityCategory.DIAGNOSTIC
+
+    @property
+    def icon(self) -> str:
+        """Set icon."""
+
+        return 'mdi:counter'
+
+
+class FeederRawPlanData(CoordinatorEntity, SensorEntity):
+    """Representation of the last time food was dispensed."""
+
+    def __init__(self, coordinator, feeder_id):
+        super().__init__(coordinator)
+        self.feeder_id = feeder_id
+
+    @property
+    def feeder_data(self) -> Feeder:
+        """Handle coordinator Feeder data."""
+        return self.coordinator.data.feeders[self.feeder_id]
+
+    @property
+    def device_info(self) -> dict[str, Any]:
+        """Return device registry information for this entity."""
+        return {
+            "identifiers": {(DOMAIN, self.feeder_data.id)},
+            "name": self.feeder_data.data['name'],
+            "manufacturer": "PetKit",
+            "model": FEEDERS[self.feeder_data.type],
+            "sw_version": f'{self.feeder_data.data["firmware"]}'
+        }
+
+    @property
+    def unique_id(self) -> str:
+        """Sets unique ID for this entity."""
+        return str(self.feeder_data.id) + '_raw_feed_plan_data'
+
+    @property
+    def has_entity_name(self) -> bool:
+        """Indicate that entity has name defined."""
+        return True
+
+    @property
+    def translation_key(self) -> str:
+        """Translation key for this entity."""
+        return "raw_feed_plan_data"
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the raw plan dispense of the last food dispensed."""
+        result = []
+        feed_records = self.feeder_data.device_record.get('feed', [])
+        for feed in feed_records:
+            items = feed.get("items", [])
+            for idx, item in enumerate(items):
+                id_incremental = idx
+                time_in_seconds = item.get("time", 0)
+                hours = time_in_seconds // 3600
+                minutes = (time_in_seconds % 3600) // 60
+                amount1 = item.get("amount1", 0)
+                amount2 = item.get("amount2", 0)
+                amount = amount1 + amount2
+                state = 255
+                if "state" in item:
+                    state = 0 if item["state"].get("errCode", 1) == 0 else 1
+                result.append(f"{id_incremental},{hours},{minutes},{amount},{state}")
+        return ",".join(result) if result else None
+
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to diagnostic."""
+        return EntityCategory.DIAGNOSTIC
+
+    @property
+    def icon(self) -> str | None:
+        """Set icon for the last dispensed food."""
+        return 'mdi:calendar-month'
