@@ -4470,9 +4470,18 @@ class FeederRawPlanData(CoordinatorEntity, SensorEntity):
                 amount1 = item.get("amount1", 0)
                 amount2 = item.get("amount2", 0)
                 amount = amount1 + amount2
-                state = 255
+                state = 255 # By default, we assume that the food is pending
                 if "state" in item:
-                    state = 0 if item["state"].get("errCode", 1) == 0 else 1
+                    err_code = item["state"].get("errCode", 1)
+                    if err_code == 0:
+                        # Everything was OK dispensing food
+                        state = 0
+                    elif err_code == 10:
+                        # Food was not dispensed cause SurplusControl skipped it
+                        state = 255
+                    else:
+                        # Food was not dispensed cause of other reasons
+                        state = 1
                 result.append(f"{id_incremental},{hours},{minutes},{amount},{state}")
         return ",".join(result) if result else None
 
