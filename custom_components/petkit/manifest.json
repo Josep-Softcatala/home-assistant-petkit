@@ -14,7 +14,7 @@
     "petkit_api"
   ],
   "requirements": [
-    "petkit-api==0.1.1",
+    "petkit-api==0.1.4",
     "tzlocal==5.1"
   ],
   "version": "1.0.0"
