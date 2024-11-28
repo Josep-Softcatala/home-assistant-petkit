@@ -5,7 +5,7 @@ from typing import Any
 import async_timeout
 
 from petkit_api import PetKitClient
-from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
+from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -29,10 +29,6 @@ async def async_validate_api(hass: HomeAssistant, email: str, password: str, reg
     except AuthError as err:
         LOGGER.error(f'Could not authenticate on PetKit servers: {err}')
         raise AuthError(err)
-    except TimezoneError:
-        error = 'A timezone could not be found. If you are running Home Assistant as a standalone Docker container, you must define the TZ environmental variable. If the TZ variable is defined or you are running Home Assistant OS, your timezone was not found in the tzlocal library - Please manually select a timezone during setup.'
-        LOGGER.error(f'{error}')
-        raise TimezoneError(error)
     except ServerError as err:
         LOGGER.error(f'PetKit servers are busy.Please try again later.')
         raise ServerError(err)
