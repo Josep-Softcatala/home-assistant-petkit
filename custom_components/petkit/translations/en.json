@@ -706,6 +706,12 @@
         },
         "care_plus_end_date": {
           "name": "Care+ subscription end date"
+        },
+        "times_visited": {
+          "name": "Times visited"
+        },
+        "raw_feed_plan_data": {
+          "name": "Raw feed plan data"
         }
       },
       "switch": {
