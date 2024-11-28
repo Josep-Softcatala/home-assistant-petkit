@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError, TimezoneError
+from petkit_api.exceptions import AuthError, PetKitError, RegionError, ServerError
 import voluptuous as vol
 import pycountry
 
@@ -61,8 +61,6 @@ class PetKitConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await async_validate_api(self.hass, email, password, region, timezone)
             except RegionError:
                 errors["base"] = "region_error"
-            except TimezoneError:
-                errors["base"] = "timezone_error"
             except AuthError:
                 errors["base"] = "invalid_auth"
             except ConnectionError:
