@@ -2489,7 +2489,7 @@ class PetLastUseDuration(CoordinatorEntity, SensorEntity, RestoreEntity):
         duration_dict: dict[int, int] = {}
 
         for lb_id, lb_data in self.litter_boxes.items():
-            if lb_data.statistics['statisticInfo']:
+            if 'statisticInfo' in lb_data.statistics:
                 try:
                     final_idx = max(index for index, stat in enumerate(lb_data.statistics['statisticInfo']) if stat['petId'] == self.pet_data.id)
                 # Handle if the pet didn't use the litter box
