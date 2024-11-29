@@ -71,7 +71,7 @@
           "name": "Battery"
         },
         "wastebin": {
-          "name": "Wastebin"
+          "name": "Wastebin filled"
         },
         "litter": {
           "name": "Litter"
@@ -92,7 +92,7 @@
           "name": "Food level hopper 2"
         },
         "waste_bin_presence": {
-          "name": "Waste bin presence"
+          "name": "Wastebin presence"
         },
         "care_plus_subscription": {
           "name": "Care+ subscription"
