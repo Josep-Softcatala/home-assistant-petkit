@@ -738,7 +738,7 @@ class DeodorizerReset(CoordinatorEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Handle the button press."""
 
-        await self.coordinator.client.reset_pura_max_deodorizer(self.lb_data)
+        await self.coordinator.client.reset_deodorizer(self.lb_data)
         await self.coordinator.async_request_refresh()
 
 
