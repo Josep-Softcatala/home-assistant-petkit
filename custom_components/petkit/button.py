@@ -82,18 +82,13 @@ async def async_setup_entry(
                 LBResetDeodorizer(coordinator, lb_id)
             ))
         # Purobot ULTRA
-        if lb_data.type == 't6':
+        if lb_data.type in  ['t4', 't6']:
             buttons.extend((
                 DeodorizerReset(coordinator, lb_id),
                 MAXDumpLitter(coordinator, lb_id),
                 MAXPauseDumping(coordinator, lb_id),
                 MAXResumeDumping(coordinator, lb_id)
             ))
-            # Pura MAX with Pura Air
-            if 'k3Device' in lb_data.device_detail:
-                buttons.append(
-                    MAXLightOn(coordinator, lb_id)
-                )
         if lb_data.type == 't4':
             buttons.extend((
                 MAXStartMaint(coordinator, lb_id),
@@ -101,6 +96,11 @@ async def async_setup_entry(
                 MAXPauseExitMaint(coordinator, lb_id),
                 MAXResumeExitMaint(coordinator, lb_id)
             ))
+        # Pura MAX / Pura MAX 2 with Pura Air
+        if 'k3Device' in lb_data.device_detail:
+            buttons.append(
+                MAXLightOn(coordinator, lb_id)
+            )
 
     async_add_entities(buttons)
 
