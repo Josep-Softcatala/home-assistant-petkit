@@ -55,7 +55,7 @@ async def async_setup_entry(
             )
 
         # D4sh Feeder
-        if feeder_data.type == 'd4sh':
+        if feeder_data.type in ['d4h', 'd4sh']:
             numbers.append(
                 Volume(coordinator, feeder_id),
             )

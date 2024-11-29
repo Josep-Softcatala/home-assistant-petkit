@@ -43,7 +43,7 @@ async def async_setup_entry(
         )
 
         # D3, D4, D4s and D4sh
-        if feeder_data.type in ['d3', 'd4', 'd4s', 'd4sh', 'feeder']:
+        if feeder_data.type in ['d3', 'd4', 'd4s', 'd4h', 'd4sh', 'feeder']:
             buttons.append(
                 CancelManualFeed(coordinator, feeder_id)
             )
@@ -55,7 +55,7 @@ async def async_setup_entry(
             )
 
         # D4s
-        if feeder_data.type in ['d4s', 'd4sh']:
+        if feeder_data.type in ['d4s', 'd4h', 'd4sh']:
             buttons.append(
                 FoodReplenished(coordinator, feeder_id)
             )
